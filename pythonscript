@@ -1,0 +1,55 @@
+import subprocess
+
+# Define the input specifications
+Vin = 3    # Input voltage = 3V
+Iin = 10   # Input current = 10A
+Ichg = 5   # Charging current = 5A
+Csup = 100e-6 # Supercapacitor value = 100F
+Vsup = 2.7    # Supercapacitor voltage rating = 2.7V
+
+# Define the simulation parameters
+temp = 25     # Temperature = 25 degrees Celsius
+tstep = 1e-6  # Time step = 1 microsecond
+tstop = 1     # Stop time = 1 second
+
+# Create the LTSpice netlist string
+netlist = f"""
+Vin in 0 DC {Vin}V
+Iin in 0 DC {Iin}A
+R1 in 1 {Ichg/Csup}Ohm
+Vchg 1 0 PULSE(0V 2.6V 0s 10ms 10ms 1s)
+Vstop 2 0 DC {Vsup}V
+Csup 1 2 {Csup}F IC=0V
+
+.temp {temp}
+.tran {tstep} {tstop}
+"""
+
+# Write the netlist to a file
+with open('charging_circuit.net', 'w') as f:
+    f.write(netlist)
+
+# Run the LTSpice simulation using the subprocess module
+cmd = ['ltspice', '-b', 'charging_circuit.net']
+subprocess.run(cmd)
+
+# Load the simulation data using the LTSpiceRaw class
+from ltspice import LTSpiceRaw
+sim = LTSpiceRaw('charging_circuit.raw')
+
+# Extract the voltage and current waveforms
+time = sim.time
+Vin = sim.get_data('Vin')
+Iin = sim.get_data('Iin')
+Vsup = sim.get_data('Vstop')
+
+# Plot the waveforms using matplotlib
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots()
+ax.plot(time, Vin, label='Input Voltage')
+ax.plot(time, Iin, label='Input Current')
+ax.plot(time, Vsup, label='Supercapacitor Voltage')
+ax.set_xlabel('Time (s)')
+ax.set_ylabel('Voltage/Current (V/A)')
+ax.legend()
+plt.show()
