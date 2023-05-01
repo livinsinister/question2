@@ -1,4 +1,4 @@
-The steps required for designing and simulating the charginf ckt in LTSpice:
+The steps required for designing and simulating the charging ckt in LTSpice:
 1. Open LTSpice and create a new schematic.
 2. Add a voltage source and set its value to 3V and its resistance to 0.1 ohms. This simulates a 3V power supply capable of delivering 10A.
 3. Add a series resistor of 0.2 ohms and connect it in series with the voltage source. This resistor limits the charging current to 5A.
