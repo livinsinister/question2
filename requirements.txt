@@ -1,0 +1,4 @@
+ltspice
+matplotlib
+numpy
+pip install -r requirements.txt
